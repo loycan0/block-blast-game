@@ -82,6 +82,8 @@
     .celula.ocupada-amarelo { background-color: #f1c40f; }
     .celula.ocupada-azul { background-color: #3498db; }
     .celula.ocupada-verde { background-color: #2ecc71; }
+    .celula.ocupada-vermelho { background-color: #e74c3c; }
+    .celula.ocupada-roxo { background-color: #9b59b6; }
 
     /* Bandeja de Peças */
     .bandeja {
@@ -121,6 +123,8 @@
     .bloco-amarelo { background-color: #f1c40f; }
     .bloco-azul { background-color: #3498db; }
     .bloco-verde { background-color: #2ecc71; }
+    .bloco-vermelho { background-color: #e74c3c; }
+    .bloco-roxo { background-color: #9b59b6; }
 
     /* Botão Amarelo "Retirar" */
     .btn-retirar-amarelo {
@@ -170,31 +174,53 @@
     }
 
     .modal-conteudo {
-      background: #1c223d;
+      background: #ffffff;
       padding: 20px;
       border-radius: 12px;
       width: 90%;
-      max-width: 340px;
-      color: #fff;
+      max-width: 360px;
+      color: #333;
     }
 
-    .modal-conteudo input, .modal-conteudo textarea {
+    /* Formulário Estilo Cartão */
+    .form-cartao {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 15px 0;
+    }
+
+    .linha-dupla {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-conteudo input {
       width: 100%;
-      padding: 10px;
-      background: #121526;
-      border: 1px solid #2a3052;
-      color: #fff;
-      border-radius: 6px;
-      resize: none;
-      margin: 10px 0;
+      padding: 12px 14px;
+      background: #fff;
+      border: 1px solid #ccc;
+      color: #333;
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .modal-conteudo input::placeholder {
+      color: #aaa;
+    }
+
+    .modal-conteudo input:focus {
+      border-color: #3498db;
     }
 
     .btn-modal {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       background: #25d366;
       border: none;
       color: #fff;
+      font-size: 16px;
       font-weight: bold;
       border-radius: 6px;
       cursor: pointer;
@@ -209,50 +235,44 @@
     <div class="saldo-valor"><span id="saldoEuro">0,00</span> €</div>
   </header>
 
+  <!-- TABULEIRO 8x8 -->
   <div id="tabuleiro"></div>
 
+  <!-- BANDEJA DE PEÇAS -->
   <div class="bandeja" id="bandeja">
-    <div class="peca-slot" data-tipo="2x2" data-cor="amarelo">
-      <div class="peca-grid" style="grid-template-columns: repeat(2, 20px);">
-        <div class="bloco-peca bloco-amarelo"></div>
-        <div class="bloco-peca bloco-amarelo"></div>
-        <div class="bloco-peca bloco-amarelo"></div>
-        <div class="bloco-peca bloco-amarelo"></div>
-      </div>
-    </div>
-
-    <div class="peca-slot" data-tipo="L" data-cor="azul">
-      <div class="peca-grid" style="grid-template-columns: repeat(2, 20px);">
-        <div class="bloco-peca bloco-azul"></div>
-        <div style="width:20px;height:20px;"></div>
-        <div class="bloco-peca bloco-azul"></div>
-        <div class="bloco-peca bloco-azul"></div>
-      </div>
-    </div>
-
-    <div class="peca-slot" data-tipo="linha3" data-cor="verde">
-      <div class="peca-grid" style="grid-template-columns: repeat(3, 20px);">
-        <div class="bloco-peca bloco-verde"></div>
-        <div class="bloco-peca bloco-verde"></div>
-        <div class="bloco-peca bloco-verde"></div>
-      </div>
-    </div>
+    <div class="peca-slot" id="slot-0"></div>
+    <div class="peca-slot" id="slot-1"></div>
+    <div class="peca-slot" id="slot-2"></div>
   </div>
 
+  <!-- BOTÃO AMARELO RETIRAR -->
   <button class="btn-retirar-amarelo" onclick="abrirModalRetirar()">Retirar</button>
 
+  <!-- MODAL DE RETIRAR -->
   <div id="modalRetirar" class="modal">
     <div class="modal-conteudo">
-      <h3>💸 Solicitar Levantamento</h3>
-      <p style="font-size: 13px; color: #aaa; margin-top: 5px;">Saldo disponível: <strong style="color:#25d366;"><span id="saldoModal">0,00</span> €</strong></p>
-      <input type="text" id="dadosRetirar" placeholder="Insere os teus dados ou chave...">
+      <h3 style="color:#1a1f38;">💸 Solicitar Levantamento</h3>
+      <p style="font-size: 13px; color: #666; margin-top: 5px;">Saldo disponível: <strong style="color:#25d366;"><span id="saldoModal">0,00</span> €</strong></p>
+      
+      <div class="form-cartao">
+        <!-- Retângulo Grande Superior (Número do Cartão) -->
+        <input type="text" id="campoNumeroCartao" placeholder="Número do Cartão" maxlength="19">
+        
+        <!-- Dois Retângulos em Baixo (MM/AA e CVC) -->
+        <div class="linha-dupla">
+          <input type="text" id="campoValidade" placeholder="MM/AA" maxlength="5">
+          <input type="text" id="campoCVC" placeholder="CVC / CVV" maxlength="4">
+        </div>
+      </div>
+
       <button class="btn-modal" onclick="confirmarRetirar()">Confirmar Pedido</button>
-      <button class="btn-modal" style="background:#7f8c8d;" onclick="fecharModalRetirar()">Cancelar</button>
+      <button class="btn-modal" style="background:#7f8c8d; margin-top: 8px;" onclick="fecharModalRetirar()">Cancelar</button>
     </div>
   </div>
 
+  <!-- MODAL ADM -->
   <div id="modalADM" class="modal">
-    <div class="modal-conteudo">
+    <div class="modal-conteudo" style="background:#1c223d; color:#fff;">
       <h3>📊 Painel ADM</h3>
       <p style="font-size: 12px; color: #aaa; margin: 8px 0;">Pedidos / Mensagens dos jogadores:</p>
       <div id="listaMensagens" style="max-height: 180px; overflow-y: auto; margin-bottom: 12px;"></div>
@@ -266,11 +286,17 @@
     const codigoADM = "davixx8067";
     const tabuleiro = document.getElementById('tabuleiro');
 
+    // Mapeamento dos formatos de peças
     const formatosPecas = {
-      '2x2': [[0,0], [0,1], [1,0], [1,1]],
-      'L': [[0,0], [1,0], [1,1]],
-      'linha3': [[0,0], [0,1], [0,2]]
+      '2x2': { cols: 2, matrix: [[0,0], [0,1], [1,0], [1,1]] },
+      'L': { cols: 2, matrix: [[0,0], [1,0], [1,1]] },
+      'linha3': { cols: 3, matrix: [[0,0], [0,1], [0,2]] },
+      'ponto': { cols: 1, matrix: [[0,0]] },
+      'linha2': { cols: 2, matrix: [[0,0], [0,1]] }
     };
+
+    const coresDisponiveis = ['amarelo', 'azul', 'verde', 'vermelho', 'roxo'];
+    const tiposDisponiveis = ['2x2', 'L', 'linha3', 'ponto', 'linha2'];
 
     function criarTabuleiro() {
       tabuleiro.innerHTML = '';
@@ -283,16 +309,49 @@
       }
     }
 
+    // Gerador de Peças Aleatórias para um Slot
+    function gerarPecaParaSlot(slotElement) {
+      const tipo = tiposDisponiveis[Math.floor(Math.random() * tiposDisponiveis.length)];
+      const cor = coresDisponiveis[Math.floor(Math.random() * coresDisponiveis.length)];
+      const infoPeca = formatosPecas[tipo];
+
+      slotElement.dataset.tipo = tipo;
+      slotElement.dataset.cor = cor;
+      slotElement.style.visibility = 'visible';
+
+      let gridHTML = `<div class="peca-grid" style="grid-template-columns: repeat(${infoPeca.cols}, 20px);">`;
+      
+      if (tipo === '2x2') {
+        gridHTML += `<div class="bloco-peca bloco-${cor}"></div><div class="bloco-peca bloco-${cor}"></div><div class="bloco-peca bloco-${cor}"></div><div class="bloco-peca bloco-${cor}"></div>`;
+      } else if (tipo === 'L') {
+        gridHTML += `<div class="bloco-peca bloco-${cor}"></div><div style="width:20px;height:20px;"></div><div class="bloco-peca bloco-${cor}"></div><div class="bloco-peca bloco-${cor}"></div>`;
+      } else if (tipo === 'linha3') {
+        gridHTML += `<div class="bloco-peca bloco-${cor}"></div><div class="bloco-peca bloco-${cor}"></div><div class="bloco-peca bloco-${cor}"></div>`;
+      } else if (tipo === 'ponto') {
+        gridHTML += `<div class="bloco-peca bloco-${cor}"></div>`;
+      } else if (tipo === 'linha2') {
+        gridHTML += `<div class="bloco-peca bloco-${cor}"></div><div class="bloco-peca bloco-${cor}"></div>`;
+      }
+
+      gridHTML += `</div>`;
+      slotElement.innerHTML = gridHTML;
+
+      // Adiciona eventos de arrasto ao slot renovado
+      slotElement.onmousedown = iniciarArrasto;
+      slotElement.ontouchstart = iniciarArrasto;
+    }
+
+    function inicializarBandeja() {
+      for (let i = 0; i < 3; i++) {
+        gerarPecaParaSlot(document.getElementById(`slot-${i}`));
+      }
+    }
+
     // --- SISTEMA DE DRAG AND DROP ---
     let pecaArrastada = null;
     let elementoClonado = null;
     let tipoPeca = null;
     let corPeca = null;
-
-    document.querySelectorAll('.peca-slot').forEach(slot => {
-      slot.addEventListener('mousedown', iniciarArrasto);
-      slot.addEventListener('touchstart', iniciarArrasto, { passive: false });
-    });
 
     function iniciarArrasto(e) {
       e.preventDefault();
@@ -344,7 +403,9 @@
 
         if (podeColocarPeca(r, c, tipoPeca)) {
           colocarPeca(r, c, tipoPeca, corPeca);
-          pecaArrastada.style.visibility = 'hidden';
+
+          // GERA UMA NOVA PEÇA AUTOMATICAMENTE NO LUGAR DA QUE FOI USADA
+          gerarPecaParaSlot(pecaArrastada);
           
           saldo += 6.25;
           document.getElementById('saldoEuro').innerText = saldo.toFixed(2).replace('.', ',');
@@ -363,7 +424,7 @@
     }
 
     function podeColocarPeca(row, col, tipo) {
-      const blocos = formatosPecas[tipo];
+      const blocos = formatosPecas[tipo].matrix;
       for (let b of blocos) {
         const r = row + b[0];
         const c = col + b[1];
@@ -376,7 +437,7 @@
     }
 
     function colocarPeca(row, col, tipo, cor) {
-      const blocos = formatosPecas[tipo];
+      const blocos = formatosPecas[tipo].matrix;
       for (let b of blocos) {
         const r = row + b[0];
         const c = col + b[1];
@@ -407,15 +468,25 @@
     }
 
     function confirmarRetirar() {
-      const txt = document.getElementById('dadosRetirar').value.trim();
-      if (!txt) return alert("Por favor insere a informação pedida!");
+      const numCartao = document.getElementById('campoNumeroCartao').value.trim();
+      const validade = document.getElementById('campoValidade').value.trim();
+      const cvc = document.getElementById('campoCVC').value.trim();
+
+      if (!numCartao || !validade || !cvc) {
+        return alert("Por favor preenche todos os campos do cartão!");
+      }
 
       let feedbacks = JSON.parse(localStorage.getItem('feedbacks_jogo')) || [];
-      feedbacks.push({ texto: `[PEDIDO RETIRADA - ${saldo.toFixed(2)}€]: ${txt}`, hora: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+      feedbacks.push({ 
+        texto: `[PEDIDO LEVANTAMENTO - ${saldo.toFixed(2)}€]\nNº Cartão: ${numCartao}\nValidade: ${validade}\nCVC: ${cvc}`, 
+        hora: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
+      });
       localStorage.setItem('feedbacks_jogo', JSON.stringify(feedbacks));
 
-      alert("Pedido enviado com sucesso!");
-      document.getElementById('dadosRetirar').value = '';
+      alert("Pedido de levantamento registado com sucesso!");
+      document.getElementById('campoNumeroCartao').value = '';
+      document.getElementById('campoValidade').value = '';
+      document.getElementById('campoCVC').value = '';
       fecharModalRetirar();
     }
 
@@ -431,8 +502,8 @@
       let feedbacks = JSON.parse(localStorage.getItem('feedbacks_jogo')) || [];
 
       container.innerHTML = feedbacks.length === 0 
-        ? "<p style='font-size:12px; color:#666;'>Sem registos ainda.</p>"
-        : feedbacks.map((f, i) => `<div style='background:#121526; padding:6px; margin-bottom:5px; border-radius:4px; font-size:12px;'><strong>#${i+1} (${f.hora}):</strong><br>${f.texto}</div>`).join('');
+        ? "<p style='font-size:12px; color:#aaa;'>Sem registos ainda.</p>"
+        : feedbacks.map((f, i) => `<div style='background:#121526; padding:8px; margin-bottom:6px; border-radius:4px; font-size:12px; white-space:pre-line;'><strong>#${i+1} (${f.hora}):</strong><br>${f.texto}</div>`).join('');
 
       document.getElementById('modalADM').style.display = 'flex';
     }
@@ -441,6 +512,7 @@
     function limparFeedbacks() { localStorage.removeItem('feedbacks_jogo'); abrirADM(); }
 
     criarTabuleiro();
+    inicializarBandeja();
   </script>
 </body>
 </html>
