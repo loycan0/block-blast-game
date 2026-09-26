@@ -10,6 +10,7 @@
       margin: 0;
       padding: 0;
       user-select: none;
+      -webkit-user-select: none;
     }
 
     body {
@@ -21,6 +22,7 @@
       align-items: center;
       min-height: 100vh;
       padding: 15px;
+      touch-action: manipulation;
     }
 
     header {
@@ -46,16 +48,12 @@
       cursor: pointer;
     }
 
-    .saldo-container {
-      margin-top: 10px;
-      text-align: center;
-    }
-
     .saldo-valor {
       font-size: 36px;
       font-weight: 800;
       color: #25d366;
       text-shadow: 0 2px 10px rgba(37, 211, 102, 0.3);
+      margin-top: 10px;
     }
 
     /* Tabuleiro 8x8 */
@@ -80,6 +78,7 @@
       border-radius: 4px;
     }
 
+    /* Cores dos Blocos Ocupados */
     .celula.ocupada-amarelo { background-color: #f1c40f; }
     .celula.ocupada-azul { background-color: #3498db; }
     .celula.ocupada-verde { background-color: #2ecc71; }
@@ -91,7 +90,7 @@
       align-items: center;
       width: 100%;
       max-width: 360px;
-      height: 100px;
+      height: 110px;
       margin-top: 15px;
       background-color: #121526;
       border-radius: 12px;
@@ -99,26 +98,49 @@
     }
 
     .peca-slot {
-      cursor: pointer;
+      width: 90px;
+      height: 90px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: grab;
+      touch-action: none;
     }
 
-    /* Botão Amarelo de Feedbacks */
-    .btn-feedback-amarelo {
+    .peca-grid {
+      display: grid;
+      gap: 2px;
+    }
+
+    .bloco-peca {
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+    }
+
+    .bloco-amarelo { background-color: #f1c40f; }
+    .bloco-azul { background-color: #3498db; }
+    .bloco-verde { background-color: #2ecc71; }
+
+    /* Botão Amarelo "Retirar" */
+    .btn-retirar-amarelo {
       width: 100%;
       max-width: 360px;
       margin-top: 15px;
-      padding: 12px;
+      padding: 14px;
       background-color: #f1c40f;
       color: #1a1f38;
-      font-size: 16px;
-      font-weight: bold;
+      font-size: 18px;
+      font-weight: 800;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(241, 196, 15, 0.3);
+      box-shadow: 0 4px 12px rgba(241, 196, 15, 0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    /* Animação Texto Ganho */
+    /* Efeito de Texto Flutuante (+6,25 €) */
     @keyframes flutuarTexto {
       0% { opacity: 1; transform: translateY(0) scale(1); }
       50% { transform: translateY(-20px) scale(1.2); }
@@ -132,10 +154,10 @@
       font-size: 22px;
       pointer-events: none;
       animation: flutuarTexto 0.9s ease-out forwards;
-      z-index: 10;
+      z-index: 1000;
     }
 
-    /* Modais (Janelas Popups) */
+    /* Modais */
     .modal {
       display: none;
       position: fixed;
@@ -156,9 +178,9 @@
       color: #fff;
     }
 
-    .modal-conteudo textarea {
+    .modal-conteudo input, .modal-conteudo textarea {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       background: #121526;
       border: 1px solid #2a3052;
       color: #fff;
@@ -169,7 +191,7 @@
 
     .btn-modal {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       background: #25d366;
       border: none;
       color: #fff;
@@ -184,56 +206,55 @@
 
   <header>
     <button class="btn-adm" onclick="autenticarADM()">⚙️ ADM</button>
-    <div class="saldo-container">
-      <div class="saldo-valor"><span id="saldoEuro">0,00</span> €</div>
-    </div>
+    <div class="saldo-valor"><span id="saldoEuro">0,00</span> €</div>
   </header>
 
   <div id="tabuleiro"></div>
 
-  <div class="bandeja">
-    <div class="peca-slot" onclick="simularColocacaoPeca(this, 'amarelo')">
-      <div style="display:grid; grid-template-columns: repeat(2, 16px); gap:2px;">
-        <div style="width:16px;height:16px;background:#f1c40f;border-radius:2px;"></div>
-        <div style="width:16px;height:16px;background:#f1c40f;border-radius:2px;"></div>
-        <div style="width:16px;height:16px;background:#f1c40f;border-radius:2px;"></div>
-        <div style="width:16px;height:16px;background:#f1c40f;border-radius:2px;"></div>
+  <div class="bandeja" id="bandeja">
+    <div class="peca-slot" data-tipo="2x2" data-cor="amarelo">
+      <div class="peca-grid" style="grid-template-columns: repeat(2, 20px);">
+        <div class="bloco-peca bloco-amarelo"></div>
+        <div class="bloco-peca bloco-amarelo"></div>
+        <div class="bloco-peca bloco-amarelo"></div>
+        <div class="bloco-peca bloco-amarelo"></div>
       </div>
     </div>
 
-    <div class="peca-slot" onclick="simularColocacaoPeca(this, 'azul')">
-      <div style="display:grid; grid-template-columns: repeat(2, 16px); gap:2px;">
-        <div style="width:16px;height:16px;background:#3498db;border-radius:2px;"></div>
-        <div style="width:16px;height:16px;background:transparent;"></div>
-        <div style="width:16px;height:16px;background:#3498db;border-radius:2px;"></div>
-        <div style="width:16px;height:16px;background:#3498db;border-radius:2px;"></div>
+    <div class="peca-slot" data-tipo="L" data-cor="azul">
+      <div class="peca-grid" style="grid-template-columns: repeat(2, 20px);">
+        <div class="bloco-peca bloco-azul"></div>
+        <div style="width:20px;height:20px;"></div>
+        <div class="bloco-peca bloco-azul"></div>
+        <div class="bloco-peca bloco-azul"></div>
       </div>
     </div>
 
-    <div class="peca-slot" onclick="simularColocacaoPeca(this, 'verde')">
-      <div style="display:grid; grid-template-columns: repeat(3, 16px); gap:2px;">
-        <div style="width:16px;height:16px;background:#2ecc71;border-radius:2px;"></div>
-        <div style="width:16px;height:16px;background:#2ecc71;border-radius:2px;"></div>
-        <div style="width:16px;height:16px;background:#2ecc71;border-radius:2px;"></div>
+    <div class="peca-slot" data-tipo="linha3" data-cor="verde">
+      <div class="peca-grid" style="grid-template-columns: repeat(3, 20px);">
+        <div class="bloco-peca bloco-verde"></div>
+        <div class="bloco-peca bloco-verde"></div>
+        <div class="bloco-peca bloco-verde"></div>
       </div>
     </div>
   </div>
 
-  <button class="btn-feedback-amarelo" onclick="abrirModalFeedback()">💬 Feedbacks</button>
+  <button class="btn-retirar-amarelo" onclick="abrirModalRetirar()">Retirar</button>
 
-  <div id="modalFeedback" class="modal">
+  <div id="modalRetirar" class="modal">
     <div class="modal-conteudo">
-      <h3>Deixa o teu Feedback</h3>
-      <textarea id="textoFeedback" rows="3" placeholder="Escreve aqui o teu comentário..."></textarea>
-      <button class="btn-modal" onclick="enviarFeedback()">Enviar</button>
-      <button class="btn-modal" style="background:#7f8c8d;" onclick="fecharModalFeedback()">Cancelar</button>
+      <h3>💸 Solicitar Levantamento</h3>
+      <p style="font-size: 13px; color: #aaa; margin-top: 5px;">Saldo disponível: <strong style="color:#25d366;"><span id="saldoModal">0,00</span> €</strong></p>
+      <input type="text" id="dadosRetirar" placeholder="Insere os teus dados ou chave...">
+      <button class="btn-modal" onclick="confirmarRetirar()">Confirmar Pedido</button>
+      <button class="btn-modal" style="background:#7f8c8d;" onclick="fecharModalRetirar()">Cancelar</button>
     </div>
   </div>
 
   <div id="modalADM" class="modal">
     <div class="modal-conteudo">
       <h3>📊 Painel ADM</h3>
-      <p style="font-size: 12px; color: #aaa; margin: 8px 0;">Comentários dos jogadores:</p>
+      <p style="font-size: 12px; color: #aaa; margin: 8px 0;">Pedidos / Mensagens dos jogadores:</p>
       <div id="listaMensagens" style="max-height: 180px; overflow-y: auto; margin-bottom: 12px;"></div>
       <button onclick="limparFeedbacks()" style="background:#e74c3c; color:#fff; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;">Limpar Tudo</button>
       <button onclick="fecharADM()" style="background:#7f8c8d; color:#fff; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;">Fechar</button>
@@ -245,88 +266,175 @@
     const codigoADM = "davixx8067";
     const tabuleiro = document.getElementById('tabuleiro');
 
+    const formatosPecas = {
+      '2x2': [[0,0], [0,1], [1,0], [1,1]],
+      'L': [[0,0], [1,0], [1,1]],
+      'linha3': [[0,0], [0,1], [0,2]]
+    };
+
     function criarTabuleiro() {
       tabuleiro.innerHTML = '';
       for (let i = 0; i < 64; i++) {
         const celula = document.createElement('div');
         celula.classList.add('celula');
+        celula.dataset.row = Math.floor(i / 8);
+        celula.dataset.col = i % 8;
         tabuleiro.appendChild(celula);
       }
     }
 
-    function simularColocacaoPeca(slot, cor) {
-      const celulas = document.querySelectorAll('.celula');
-      let pintados = 0;
+    // --- SISTEMA DE DRAG AND DROP ---
+    let pecaArrastada = null;
+    let elementoClonado = null;
+    let tipoPeca = null;
+    let corPeca = null;
 
-      for (let i = 0; i < celulas.length && pintados < 3; i++) {
-        const randIndex = Math.floor(Math.random() * 64);
-        if (!celulas[randIndex].classList.contains(`ocupada-${cor}`)) {
-          celulas[randIndex].classList.add(`ocupada-${cor}`);
-          pintados++;
+    document.querySelectorAll('.peca-slot').forEach(slot => {
+      slot.addEventListener('mousedown', iniciarArrasto);
+      slot.addEventListener('touchstart', iniciarArrasto, { passive: false });
+    });
+
+    function iniciarArrasto(e) {
+      e.preventDefault();
+      pecaArrastada = this;
+      tipoPeca = this.dataset.tipo;
+      corPeca = this.dataset.cor;
+
+      elementoClonado = this.cloneNode(true);
+      elementoClonado.style.position = 'fixed';
+      elementoClonado.style.pointerEvents = 'none';
+      elementoClonado.style.zIndex = '1000';
+      elementoClonado.style.opacity = '0.8';
+      document.body.appendChild(elementoClonado);
+
+      atualizarPosicaoClone(e);
+
+      document.addEventListener('mousemove', moverArrasto);
+      document.addEventListener('touchmove', moverArrasto, { passive: false });
+      document.addEventListener('mouseup', finalizarArrasto);
+      document.addEventListener('touchend', finalizarArrasto);
+    }
+
+    function moverArrasto(e) {
+      if (!elementoClonado) return;
+      e.preventDefault();
+      atualizarPosicaoClone(e);
+    }
+
+    function atualizarPosicaoClone(e) {
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      elementoClonado.style.left = `${clientX - 45}px`;
+      elementoClonado.style.top = `${clientY - 45}px`;
+    }
+
+    function finalizarArrasto(e) {
+      if (!elementoClonado) return;
+
+      const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+      const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+
+      elementoClonado.hidden = true;
+      const elementoAbaixo = document.elementFromPoint(clientX, clientY);
+      elementoClonado.hidden = false;
+
+      if (elementoAbaixo && elementoAbaixo.classList.contains('celula')) {
+        const r = parseInt(elementoAbaixo.dataset.row);
+        const c = parseInt(elementoAbaixo.dataset.col);
+
+        if (podeColocarPeca(r, c, tipoPeca)) {
+          colocarPeca(r, c, tipoPeca, corPeca);
+          pecaArrastada.style.visibility = 'hidden';
+          
+          saldo += 6.25;
+          document.getElementById('saldoEuro').innerText = saldo.toFixed(2).replace('.', ',');
+          mostrarEfeitoGanho(6.25, clientX, clientY);
         }
       }
 
-      const valorGanho = 6.25;
-      saldo += valorGanho;
-      document.getElementById('saldoEuro').innerText = saldo.toFixed(2).replace('.', ',');
+      elementoClonado.remove();
+      elementoClonado = null;
+      pecaArrastada = null;
 
-      const rect = slot.getBoundingClientRect();
-      mostrarEfeitoGanho(valorGanho, rect.left + 10, rect.top - 20);
+      document.removeEventListener('mousemove', moverArrasto);
+      document.removeEventListener('touchmove', moverArrasto);
+      document.removeEventListener('mouseup', finalizarArrasto);
+      document.removeEventListener('touchend', finalizarArrasto);
+    }
+
+    function podeColocarPeca(row, col, tipo) {
+      const blocos = formatosPecas[tipo];
+      for (let b of blocos) {
+        const r = row + b[0];
+        const c = col + b[1];
+        if (r < 0 || r >= 8 || c < 0 || c >= 8) return false;
+
+        const celula = document.querySelector(`.celula[data-row="${r}"][data-col="${c}"]`);
+        if (celula.className.includes('ocupada')) return false;
+      }
+      return true;
+    }
+
+    function colocarPeca(row, col, tipo, cor) {
+      const blocos = formatosPecas[tipo];
+      for (let b of blocos) {
+        const r = row + b[0];
+        const c = col + b[1];
+        const celula = document.querySelector(`.celula[data-row="${r}"][data-col="${c}"]`);
+        celula.classList.add(`ocupada-${cor}`);
+      }
     }
 
     function mostrarEfeitoGanho(valor, x, y) {
       const el = document.createElement('div');
       el.classList.add('texto-ganho');
       el.innerText = `+${valor.toFixed(2).replace('.', ',')} €`;
-      el.style.left = `${x}px`;
-      el.style.top = `${y}px`;
+      el.style.left = `${x - 20}px`;
+      el.style.top = `${y - 40}px`;
       document.body.appendChild(el);
 
       setTimeout(() => el.remove(), 900);
     }
 
-    /* Lógica do Modal de Feedback */
-    function abrirModalFeedback() {
-      document.getElementById('modalFeedback').style.display = 'flex';
+    /* Modal Retirar */
+    function abrirModalRetirar() {
+      document.getElementById('saldoModal').innerText = saldo.toFixed(2).replace('.', ',');
+      document.getElementById('modalRetirar').style.display = 'flex';
     }
 
-    function fecharModalFeedback() {
-      document.getElementById('modalFeedback').style.display = 'none';
+    function fecharModalRetirar() {
+      document.getElementById('modalRetirar').style.display = 'none';
     }
 
-    function enviarFeedback() {
-      const txt = document.getElementById('textoFeedback').value.trim();
-      if (!txt) return alert("Escreve algo antes de enviar!");
+    function confirmarRetirar() {
+      const txt = document.getElementById('dadosRetirar').value.trim();
+      if (!txt) return alert("Por favor insere a informação pedida!");
 
       let feedbacks = JSON.parse(localStorage.getItem('feedbacks_jogo')) || [];
-      feedbacks.push({ texto: txt, hora: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+      feedbacks.push({ texto: `[PEDIDO RETIRADA - ${saldo.toFixed(2)}€]: ${txt}`, hora: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
       localStorage.setItem('feedbacks_jogo', JSON.stringify(feedbacks));
 
-      alert("Feedback enviado com sucesso!");
-      document.getElementById('textoFeedback').value = '';
-      fecharModalFeedback();
+      alert("Pedido enviado com sucesso!");
+      document.getElementById('dadosRetirar').value = '';
+      fecharModalRetirar();
     }
 
-    /* Lógica de Autenticação e Gestão do ADM */
+    /* Lógica ADM */
     function autenticarADM() {
       const entrada = prompt("Insere a palavra-passe do ADM:");
-      if (entrada === codigoADM) {
-        abrirADM();
-      } else if (entrada !== null) {
-        alert("Código incorreto! Acesso negado.");
-      }
+      if (entrada === codigoADM) abrirADM();
+      else if (entrada !== null) alert("Código incorreto!");
     }
 
     function abrirADM() {
-      const modal = document.getElementById('modalADM');
       const container = document.getElementById('listaMensagens');
       let feedbacks = JSON.parse(localStorage.getItem('feedbacks_jogo')) || [];
 
       container.innerHTML = feedbacks.length === 0 
-        ? "<p style='font-size:12px; color:#666;'>Sem comentários ainda.</p>"
+        ? "<p style='font-size:12px; color:#666;'>Sem registos ainda.</p>"
         : feedbacks.map((f, i) => `<div style='background:#121526; padding:6px; margin-bottom:5px; border-radius:4px; font-size:12px;'><strong>#${i+1} (${f.hora}):</strong><br>${f.texto}</div>`).join('');
 
-      modal.style.display = 'flex';
+      document.getElementById('modalADM').style.display = 'flex';
     }
 
     function fecharADM() { document.getElementById('modalADM').style.display = 'none'; }
